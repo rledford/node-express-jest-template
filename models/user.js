@@ -24,6 +24,10 @@ const schema = new mongoose.Schema({
   hash: {
     type: String,
     default: ''
+  },
+  salt: {
+    type: String,
+    default: ''
   }
 });
 
