@@ -10,6 +10,12 @@ const {
   ErrorBadRequest
 } = require('../const/errors');
 
+/**
+ * Creates a new user and returns it
+ * @param {Object} userData
+ * @returns Object
+ * @throws Error
+ */
 async function create(userData = {}) {
   // validate user data
   try {
@@ -34,11 +40,23 @@ async function create(userData = {}) {
   }
 }
 
+/**
+ * Updates an existing user with the provided updates
+ * @param {String} id _id of an existing User
+ * @param {Object} updates
+ * @throws Error
+ */
 async function update(id = '', updates = {}) {
   // validate updates
   // update record
 }
 
+/**
+ * Change an existing user's password
+ * @param {String} id _id of an existing user
+ * @param {Object} updates
+ * @throws Error
+ */
 async function updatePassword(
   id = '',
   updates = { oldPassword: '', newPassword: '' }
@@ -68,6 +86,12 @@ async function findById(id = '') {
   return user;
 }
 
+/**
+ * Get all user's that match the provided filter
+ * @param {Object} filter query filter
+ * @returns Object[]
+ * @throws Error
+ */
 async function findMany(filter = {}) {
   let result = [];
   try {
@@ -80,6 +104,12 @@ async function findMany(filter = {}) {
   return result;
 }
 
+/**
+ * Deletes an existing user and returns the deleted record
+ * @param {String} id _id of an existing user
+ * @returns Object
+ * @throws Error
+ */
 async function deleteById(id = '') {
   let user = null;
   try {
