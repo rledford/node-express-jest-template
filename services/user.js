@@ -4,10 +4,10 @@ const logger = require('../logger');
 const { userValidator } = require('../validators');
 const User = require('../models/user');
 const {
-  ErrorNotFound,
-  ErrorInternal,
-  ErrorConflict,
-  ErrorBadRequest
+  NotFoundError,
+  InternalError,
+  ConflictError,
+  BadRequestError
 } = require('../const/errors');
 const authService = require('./auth');
 
@@ -22,7 +22,7 @@ async function create(userData = {}) {
   try {
     userData = userValidator.validateCreateUserData(userData);
   } catch (err) {
-    throw new ErrorBadRequest(err);
+    throw new BadRequestError(err);
   }
   // create user
   const user = new User(userData);
@@ -38,10 +38,10 @@ async function create(userData = {}) {
     return userObj;
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
-      throw new ErrorConflict('User must be unique');
+      throw new ConflictError('User must be unique');
     } else {
       logger.error(err);
-      throw new ErrorInternal();
+      throw new InternalError();
     }
   }
 }
@@ -84,10 +84,10 @@ async function findById(id = '') {
     user = await User.findById({ _id: id }, { hash: 0, salt: 0 }).lean().exec();
   } catch (err) {
     logger.error(err);
-    throw new ErrorInternal();
+    throw new InternalError();
   }
   if (user === null) {
-    throw new ErrorNotFound();
+    throw new NotFoundError();
   }
   return user;
 }
@@ -104,7 +104,7 @@ async function findMany(filter = {}) {
     result = await User.find(filter, { hash: 0, salt: 0 }).lean().exec();
   } catch (err) {
     logger.error(err);
-    throw new ErrorInternal();
+    throw new InternalError();
   }
   return result;
 }
@@ -123,10 +123,10 @@ async function deleteById(id = '') {
     }).exec();
   } catch (err) {
     logger.error(err);
-    throw new ErrorInternal();
+    throw new InternalError();
   }
   if (user === null) {
-    throw new ErrorNotFound();
+    throw new NotFoundError();
   }
   return user;
 }

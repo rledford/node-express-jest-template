@@ -6,10 +6,10 @@ const logger = require('../logger');
 const config = require('../config');
 const User = require('../models/user');
 const {
-  ErrorNotFound,
-  ErrorUnauthorized,
-  ErrorInternal,
-  ErrorBadRequest
+  NotFoundError,
+  UnauthorizedError,
+  InternalError,
+  BadRequestError
 } = require('../const/errors');
 const {
   HASH_ALGO,
@@ -63,20 +63,20 @@ function isHashMatch(value = '', salt = '', expected = '') {
  */
 async function login(username = '', password = '') {
   if (!username || !password) {
-    throw new ErrorUnauthorized('Missing credentials');
+    throw new UnauthorizedError('Missing credentials');
   }
   let user = null;
   try {
     user = await User.findOne({ username }).lean().exec();
   } catch (err) {
     logger.error(err);
-    throw new ErrorInternal();
+    throw new InternalError();
   }
   if (!user) {
-    throw new ErrorNotFound('Unknown user');
+    throw new NotFoundError('Unknown user');
   }
   if (!isHashMatch(password, user.salt, user.hash)) {
-    throw new ErrorUnauthorized('Invalid username and password combination');
+    throw new UnauthorizedError('Invalid username and password combination');
   }
   const token = createToken({
     _id: user._id.toString(),
@@ -96,7 +96,7 @@ async function createToken(authData = {}) {
     authData = authValidator.validateCreateTokenData(authData);
   } catch (err) {
     logger.error(err);
-    throw new ErrorBadRequest('Invalid user data');
+    throw new BadRequestError('Invalid user data');
   }
   const { _id, username } = authData;
   const nowInSeconds = Date.now() / 1000;
@@ -122,15 +122,15 @@ async function readToken(token = '') {
     jwt.verify(token, config.jwtSecret, (err, decoded) => {
       if (err) {
         if (err.name === 'TokenExpiredError') {
-          return reject(new ErrorUnauthorized('Token expired'));
+          return reject(new UnauthorizedError('Token expired'));
         }
-        return reject(new ErrorUnauthorized('Invalid token'));
+        return reject(new UnauthorizedError('Invalid token'));
       }
       try {
         decoded = authValidator.validateDecodedTokenData(decoded);
       } catch (err) {
         logger.error(err);
-        return reject(new ErrorUnauthorized('Invalid token'));
+        return reject(new UnauthorizedError('Invalid token'));
       }
       resolve(decoded);
     });

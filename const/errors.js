@@ -8,7 +8,7 @@ class ExtendableError extends Error {
   }
 }
 
-class ErrorBadRequest extends ExtendableError {
+class BadRequestError extends ExtendableError {
   /**
    * Create a bad request error with statusCode set to 400
    * @param {String} message custom bad request message
@@ -18,7 +18,7 @@ class ErrorBadRequest extends ExtendableError {
   }
 }
 
-class ErrorUnauthorized extends ExtendableError {
+class UnauthorizedError extends ExtendableError {
   /**
    * Create a unauthorized error with statusCode set to 401
    * @param {String} message custom unauthorized message
@@ -28,7 +28,7 @@ class ErrorUnauthorized extends ExtendableError {
   }
 }
 
-class ErrorForbidden extends ExtendableError {
+class ForbiddenError extends ExtendableError {
   /**
    * Create a forbidden error with statusCode set to 403
    * @param {String} message custom forbidden message
@@ -38,7 +38,7 @@ class ErrorForbidden extends ExtendableError {
   }
 }
 
-class ErrorNotFound extends ExtendableError {
+class NotFoundError extends ExtendableError {
   /**
    * Create a not found error with statusCode set to 404
    * @param {String} message custom not found message
@@ -48,7 +48,7 @@ class ErrorNotFound extends ExtendableError {
   }
 }
 
-class ErrorConflict extends ExtendableError {
+class ConflictError extends ExtendableError {
   /**
    * Create a conflict error with statusCode set to 409
    * @param {String} message custom conflict message
@@ -58,7 +58,7 @@ class ErrorConflict extends ExtendableError {
   }
 }
 
-class ErrorInternal extends ExtendableError {
+class InternalError extends ExtendableError {
   /**
    * Create an internal error with statusCode set to 500
    * @param {String} message custom internal message
@@ -69,10 +69,10 @@ class ErrorInternal extends ExtendableError {
 }
 
 module.exports = {
-  ErrorBadRequest,
-  ErrorUnauthorized,
-  ErrorForbidden,
-  ErrorNotFound,
-  ErrorConflict,
-  ErrorInternal
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  InternalError
 };

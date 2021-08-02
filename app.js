@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const compression = require('compression');
 const methodOverride = require('method-override');
 const helmet = require('helmet');
-const { ErrorNotFound } = require('./const/errors');
+const { NotFoundError } = require('./const/errors');
 const routes = require('./routes');
 const isTest = process.env.NODE_ENV === 'test';
 
@@ -32,7 +32,7 @@ app.use(bodyParser.json());
 app.use(routes);
 // catch errors
 app.use((req, res, next) => {
-  next(new ErrorNotFound());
+  next(new NotFoundError());
 });
 app.use((err, req, res, next) => {
   res.status(err.statusCode || 500);
