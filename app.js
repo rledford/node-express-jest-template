@@ -14,7 +14,7 @@ const isTest = process.env.NODE_ENV === 'test';
 let server = null;
 
 // build express app
-// IMPORTANT: cors is only used in api routes to prevent Access-Control-Allow-Origin * when serving resources from /public
+// NOTE: cors is only used in api routes to prevent Access-Control-Allow-Origin * when serving resources from /public
 const app = express();
 app.disable('x-powered-by');
 app.enable('trust proxy');
