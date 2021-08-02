@@ -49,8 +49,15 @@ app.on('error', (err) => {
 async function start() {
   logger.info('Starting application server');
   const port = isTest ? 0 : config.port; // when testing, port 0 is used to allow os to choose an unused port for the server
-  server = app.listen(port, () => {
-    logger.info(`Application listening on port ${port}`);
+  return new Promise((resolve) => {
+    server = app.listen(port, () => {
+      logger.info(`Application listening on port ${server.address().port}`);
+      resolve();
+    });
+    server.on('error', () => {
+      logger.error(`Application server error: ${err}`);
+      process.exit(1);
+    });
   });
 }
 
