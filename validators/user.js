@@ -14,13 +14,13 @@ const createUserDataSchema = Joi.object({
   email: Joi.string().email().allow(null, '').optional(),
   firstName: nameValidator.optional(),
   lastName: nameValidator.optional()
-}).options({ stripUnknown: true, abortEarly: true });
+}).options({ stripUnknown: true });
 
 const updateUserDataSchema = Joi.object({
   email: Joi.string().email().allow(null, '').optional(),
   firstName: nameValidator.optional(),
   lastName: nameValidator.optional()
-}).options({ stripUnknown: true, abortEarly: true });
+}).options({ stripUnknown: true });
 
 function validateCreateUserData(data = {}) {
   return Joi.attempt(data, createUserDataSchema);
