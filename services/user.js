@@ -93,7 +93,7 @@ async function findById(id = '') {
 }
 
 /**
- * Get all user's that match the provided filter
+ * Get all user's that match the provided filter - does not return sensitive properties
  * @param {Object} filter query filter
  * @returns Object[]
  * @throws Error
@@ -101,7 +101,6 @@ async function findById(id = '') {
 async function findMany(filter = {}) {
   let result = [];
   try {
-    // use lean and don't return sensitive data
     result = await User.find(filter, { hash: 0, salt: 0 }).lean().exec();
   } catch (err) {
     logger.error(err);
