@@ -37,10 +37,17 @@ router.patch('/', (req, res, next) => {
     action: 'patch'
   });
 });
-router.delete('/', (req, res, next) => {
-  res.status(200).json({
-    action: 'delete'
-  });
+
+/**
+ * Delete a user by _id
+ */
+router.delete('/:id', (req, res, next) => {
+  userService
+    .deleteById(req.params.id)
+    .then((user) => {
+      res.status(200).json(user);
+    })
+    .catch(next);
 });
 
 module.exports = router;
