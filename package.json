@@ -7,8 +7,7 @@
     "test": "jest --verbose ./tests"
   },
   "jest": {
-    "globalSetup": "./tests/setup.js",
-    "globalTeardown": "./tests/teardown.js"
+    "testEnvironment": "node"
   },
   "author": "rledford",
   "license": "MIT",
@@ -21,6 +20,7 @@
     "express": "^4.17.1",
     "helmet": "^4.6.0",
     "joi": "^17.4.1",
+    "jsonwebtoken": "^8.5.1",
     "method-override": "^3.0.0",
     "mongoose": "^5.13.3",
     "winston": "^3.3.3"
