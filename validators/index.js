@@ -1,7 +1,9 @@
 'use strict';
 
 const userValidator = require('./user');
+const authValidator = require('./auth');
 
 module.exports = {
-  userValidator
+  userValidator,
+  authValidator
 };

@@ -9,6 +9,7 @@ const {
   ErrorConflict,
   ErrorBadRequest
 } = require('../const/errors');
+const authService = require('./auth');
 
 /**
  * Creates a new user and returns it
@@ -26,15 +27,20 @@ async function create(userData = {}) {
   // create user
   const user = new User(userData);
   // hash password
+  const { hash, salt } = authService.hash(userData.password);
+  user.set({ hash, salt });
   // create record
   try {
     await user.save();
     const userObj = user.toObject();
     delete userObj.hash;
+    delete userObj.salt;
+    return userObj;
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
       throw new ErrorConflict('User must be unique');
     } else {
+      logger.error(err);
       throw new ErrorInternal();
     }
   }
@@ -75,7 +81,7 @@ async function updatePassword(
 async function findById(id = '') {
   let user = null;
   try {
-    user = await User.findById({ _id: id }, { hash: 0 }).lean().exec();
+    user = await User.findById({ _id: id }, { hash: 0, salt: 0 }).lean().exec();
   } catch (err) {
     logger.error(err);
     throw new ErrorInternal();
@@ -96,7 +102,7 @@ async function findMany(filter = {}) {
   let result = [];
   try {
     // use lean and don't return sensitive data
-    result = await User.find(filter, { hash: 0 }).lean().exec();
+    result = await User.find(filter, { hash: 0, salt: 0 }).lean().exec();
   } catch (err) {
     logger.error(err);
     throw new ErrorInternal();
@@ -113,7 +119,9 @@ async function findMany(filter = {}) {
 async function deleteById(id = '') {
   let user = null;
   try {
-    user = User.findByIdAndRemove(id, { projection: { hash: 0 } }).exec();
+    user = User.findByIdAndRemove(id, {
+      projection: { hash: 0, salt: 0 }
+    }).exec();
   } catch (err) {
     logger.error(err);
     throw new ErrorInternal();
