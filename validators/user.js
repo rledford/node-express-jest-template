@@ -22,6 +22,11 @@ const updateUserDataSchema = Joi.object({
   lastName: nameValidator.optional()
 }).options({ stripUnknown: true });
 
+const updateUserPasswordSchema = Joi.object({
+  oldPassword: Joi.string().required(),
+  newPassword: passwordValidator.required()
+});
+
 function validateCreateUserData(data = {}) {
   return Joi.attempt(data, createUserDataSchema);
 }
@@ -30,7 +35,12 @@ function validateUpdateUserData(data = {}) {
   return Joi.attempt(data, updateUserDataSchema);
 }
 
+function validateUpdateUserPasswordData(data = {}) {
+  return Joi.attempt(data, updateUserPasswordSchema);
+}
+
 module.exports = {
   validateCreateUserData,
-  validateUpdateUserData
+  validateUpdateUserData,
+  validateUpdateUserPasswordData
 };

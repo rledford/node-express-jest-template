@@ -75,16 +75,42 @@ async function update(id = '', updates = {}) {
 /**
  * Change an existing user's password
  * @param {String} id _id of an existing user
- * @param {Object} updates
+ * @param {Object} updates {oldPassword: '', newPassword: ''}
  * @throws Error
  */
 async function updatePassword(
   id = '',
   updates = { oldPassword: '', newPassword: '' }
 ) {
-  // validate password
-  // hash password
-  // update user record
+  // validate updates
+  try {
+    updates = userValidator.validateUpdateUserPasswordData(updates);
+  } catch (err) {
+    throw new BadRequestError(err.details.join('\n'));
+  }
+  let user = null;
+  try {
+    user = await User.findById(id).lean().exec();
+  } catch (err) {
+    logger.error(err);
+    throw new InternalError();
+  }
+  if (user === null) {
+    throw new NotFoundError();
+  }
+  // check oldPassword matches
+  if (authService.hash(oldPassword, user.salt).hash !== user.hash) {
+    throw new BadRequestError('Old password is incorrect');
+  }
+  const { hash, salt } = authService.hash(newPassword);
+  // update and save user record
+  user.set({ hash, salt });
+  try {
+    await user.save();
+  } catch (err) {
+    logger.error(err);
+    throw new InternalError();
+  }
 }
 
 /**
