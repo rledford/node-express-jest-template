@@ -2,6 +2,7 @@
 
 const router = require('express').Router();
 const { authService } = require('../../services');
+const { requireAuth } = require('../../middleware');
 
 /**
  * Authenticates a user using BASIC auth and responds with a JWT
@@ -21,12 +22,14 @@ router.post('/login', (req, res, next) => {
 });
 
 /**
- * Get a refreshed token if the token in the request header is valid
+ * Get a refreshed token if the token in the request header is valid and the user associated with the token still exists
  */
-router.get('/refresh', (req, res, next) => {
-  const token = (req.headers.authorization || '').split(' ')[1] || '';
+router.get('/refresh', requireAuth, (req, res, next) => {
   authService
-    .refreshToken(token)
+    .createToken({
+      _id: req.currentUser._id.toString(),
+      username: req.currentUser.username
+    })
     .then((token) => {
       res.status(200).json({
         token

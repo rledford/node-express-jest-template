@@ -94,7 +94,8 @@ async function login(username = '', password = '') {
 async function createToken(authData = {}) {
   try {
     authData = authValidator.validateCreateTokenData(authData);
-  } catch {
+  } catch (err) {
+    logger.error(err);
     throw new ErrorBadRequest('Invalid user data');
   }
   const { _id, username } = authData;
@@ -136,35 +137,9 @@ async function readToken(token = '') {
   });
 }
 
-/**
- * Returns a new token if the provided token passes verification
- * @param {String} token JWT
- * @returns String
- * @throws Error if invalid or expired
- */
-async function refreshToken(token = '') {
-  let user = null;
-  let payload = await readToken(token);
-  if (payload.exp * 1000 < Date.now()) {
-    throw new ErrorUnauthorized('Token expired');
-  }
-  try {
-    user = await User.findById(payload._id, { hash: 0, salt: 0 }).lean().exec();
-  } catch (err) {
-    logger.error(err);
-    throw new ErrorInternal();
-  }
-  if (user === null) {
-    throw new ErrorUnauthorized('Unknown user');
-  }
-  return createToken({
-    _id: user._id.toString(),
-    username: user.username
-  });
-}
-
 module.exports = {
   hash,
   login,
-  refreshToken
+  createToken,
+  readToken
 };
