@@ -1,12 +1,13 @@
 'use strict';
 
 const { userService } = require('../../services');
+const { requireAuth } = require('../../middleware');
 const router = require('express').Router();
 
 /**
  * Get a list of user records
  */
-router.get('/', (req, res, next) => {
+router.get('/', requireAuth, (req, res, next) => {
   userService
     .findMany({})
     .then((users) => {
@@ -18,7 +19,7 @@ router.get('/', (req, res, next) => {
 /**
  * Get an existing user by _id
  */
-router.get('/:id', (req, res, next) => {
+router.get('/:id', requireAuth, (req, res, next) => {
   userService
     .findById(req.params.id)
     .then((user) => {
@@ -30,7 +31,7 @@ router.get('/:id', (req, res, next) => {
 /**
  * Create a user
  */
-router.post('/', (req, res, next) => {
+router.post('/', requireAuth, (req, res, next) => {
   userService
     .create(req.body)
     .then((user) => {
@@ -43,7 +44,7 @@ router.post('/', (req, res, next) => {
  * Update a user by _id
  * TODO: implement patch route
  */
-router.patch('/:id', (req, res, next) => {
+router.patch('/:id', requireAuth, (req, res, next) => {
   res.status(200).json({
     action: 'patch'
   });
@@ -52,7 +53,7 @@ router.patch('/:id', (req, res, next) => {
 /**
  * Delete a user by _id
  */
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', requireAuth, (req, res, next) => {
   userService
     .deleteById(req.params.id)
     .then((user) => {
