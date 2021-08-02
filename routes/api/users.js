@@ -3,6 +3,9 @@
 const { userService } = require('../../services');
 const router = require('express').Router();
 
+/**
+ * Get a list of user records
+ */
 router.get('/', (req, res, next) => {
   userService
     .findMany({})
@@ -11,6 +14,10 @@ router.get('/', (req, res, next) => {
     })
     .catch(next);
 });
+
+/**
+ * Get an existing user by _id
+ */
 router.get('/:id', (req, res, next) => {
   userService
     .findById(req.params.id)
@@ -19,6 +26,10 @@ router.get('/:id', (req, res, next) => {
     })
     .catch(next);
 });
+
+/**
+ * Create a user
+ */
 router.post('/', (req, res, next) => {
   userService
     .create(req.body)
@@ -27,12 +38,12 @@ router.post('/', (req, res, next) => {
     })
     .catch(next);
 });
-router.put('/', (req, res, next) => {
-  res.status(200).json({
-    action: 'put'
-  });
-});
-router.patch('/', (req, res, next) => {
+
+/**
+ * Update a user by _id
+ * TODO: implement patch route
+ */
+router.patch('/:id', (req, res, next) => {
   res.status(200).json({
     action: 'patch'
   });
