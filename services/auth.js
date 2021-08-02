@@ -62,6 +62,9 @@ function isHashMatch(value = '', salt = '', expected = '') {
  * @throws Error
  */
 async function login(username = '', password = '') {
+  if (!username || !password) {
+    throw new ErrorUnauthorized('Missing credentials');
+  }
   let user = null;
   try {
     user = await User.findOne({ username }).lean().exec();
@@ -114,13 +117,23 @@ async function createToken(authData = {}) {
  * @throws Error if invalid or expired
  */
 async function readToken(token = '') {
-  let read = jwt.verify(token, config.jwtSecret);
-  try {
-    read = authValidator.validateReadUserTokenData(read);
-  } catch (err) {
-    throw new ErrorUnauthorized('Invalid token');
-  }
-  return read;
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, config.jwtSecret, (err, decoded) => {
+      if (err) {
+        if (err.name === 'TokenExpiredError') {
+          return reject(new ErrorUnauthorized('Token expired'));
+        }
+        return reject(new ErrorUnauthorized('Invalid token'));
+      }
+      try {
+        decoded = authValidator.validateDecodedTokenData(decoded);
+      } catch (err) {
+        logger.error(err);
+        return reject(new ErrorUnauthorized('Invalid token'));
+      }
+      resolve(decoded);
+    });
+  });
 }
 
 /**
@@ -131,7 +144,7 @@ async function readToken(token = '') {
  */
 async function refreshToken(token = '') {
   let user = null;
-  let payload = readToken(token);
+  let payload = await readToken(token);
   if (payload.exp * 1000 < Date.now()) {
     throw new ErrorUnauthorized('Token expired');
   }

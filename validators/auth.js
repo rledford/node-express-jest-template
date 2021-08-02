@@ -17,11 +17,11 @@ function validateCreateTokenData(data = {}) {
   return Joi.attempt(data, createTokenSchema);
 }
 
-function validateReadTokenData(data = {}) {
+function validateDecodedTokenData(data = {}) {
   return Joi.attempt(data, readTokenSchema);
 }
 
 module.exports = {
   validateCreateTokenData,
-  validateReadTokenData
+  validateDecodedTokenData
 };
