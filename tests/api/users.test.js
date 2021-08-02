@@ -6,13 +6,22 @@ const logger = require('../../logger');
 const app = require('../../app');
 const db = require('../../db');
 const { describe, expect, beforeAll, afterAll, it } = require('@jest/globals');
+const { userService, authService } = require('../../services');
 const request = supertest(app.instance);
 
 const mongoUri = 'mongodb://127.0.0.1:27017/test-api-users';
+const authUser = {
+  username: 'auth',
+  password: '@T3st1ng'
+};
+
+let authUserToken = ''; // set after successful login
 
 beforeAll(async () => {
   await db.connect(mongoUri);
   await app.start();
+  await userService.create(authUser);
+  authUserToken = await authService.login(authUser.username, authUser.password);
 });
 
 afterAll(async () => {
@@ -30,6 +39,7 @@ describe('POST api/users', () => {
   it('Should create a user', async () => {
     const res = await request
       .post('/api/users')
+      .auth(authUserToken, { type: 'bearer' })
       .send({ username: 'test', password: '@T3st1ng' });
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('_id');
@@ -42,6 +52,7 @@ describe('POST api/users', () => {
   it('Should NOT create user with duplicate username', async () => {
     const res = await request
       .post('/api/users')
+      .auth(authUserToken, { type: 'bearer' })
       .send({ username: 'test', password: '@T3st1ng' });
     expect(res.status).toBe(409);
   });
@@ -49,7 +60,9 @@ describe('POST api/users', () => {
 
 describe('GET api/users/:id', () => {
   it('Should get a single user by _id', async () => {
-    const res = await request.get(`/api/users/${createdUserId}`);
+    const res = await request
+      .get(`/api/users/${createdUserId}`)
+      .auth(authUserToken, { type: 'bearer' });
     expect(res.status).toBe(200);
     expect(res.body).not.toHaveProperty('salt');
     expect(res.body).not.toHaveProperty('hash');
@@ -58,7 +71,9 @@ describe('GET api/users/:id', () => {
 
 describe('GET api/users', () => {
   it('Should get a list of users', async () => {
-    const res = await request.get(`/api/users`);
+    const res = await request
+      .get(`/api/users`)
+      .auth(authUserToken, { type: 'bearer' });
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
     for (const user of res.body) {
@@ -70,7 +85,9 @@ describe('GET api/users', () => {
 
 describe('DELETE api/users/:id', () => {
   it('Should delete a single user by _id', async () => {
-    const res = await request.delete(`/api/users/${createdUserId}`);
+    const res = await request
+      .delete(`/api/users/${createdUserId}`)
+      .auth(authUserToken, { type: 'bearer' });
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('_id');
     expect(res.body).toHaveProperty('username');
