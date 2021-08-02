@@ -54,7 +54,22 @@ async function create(userData = {}) {
  */
 async function update(id = '', updates = {}) {
   // validate updates
+  try {
+    updates = userValidator.validateUpdateUserData(updates);
+  } catch (err) {
+    throw new BadRequestError(err.details.join('\n'));
+  }
+  let user = null;
   // update record
+  try {
+    user = await User.findOneAndUpdate({ _id: id }, { $set: updates }).exec();
+  } catch (err) {
+    logger.error(err);
+    throw new InternalError();
+  }
+  if (user === null) {
+    throw new NotFoundError();
+  }
 }
 
 /**
